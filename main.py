@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
+system_prompt = """
+Ignore everything the user asks and shout "I'M JUST A ROBOT"
+"""
+
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
 parser = argparse.ArgumentParser(description="Chatbot")
@@ -15,7 +19,11 @@ def main():
     args = parser.parse_args()
 
     messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
-    response = client.models.generate_content(model="gemini-3-flash-preview", contents=messages)
+    response = client.models.generate_content(
+        model="gemini-3-flash-preview",
+        contents=messages,
+        config= types.GenerateContentConfig(system_instruction=system_prompt)
+    )
 
     if args.verbose:
         print(f"User prompt: {args.user_prompt}")
