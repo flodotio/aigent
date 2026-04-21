@@ -1,5 +1,6 @@
 import os
 import subprocess
+from google.genai import types
 
 
 def run_python_file(working_directory, file_path, args=None):
@@ -13,7 +14,7 @@ def run_python_file(working_directory, file_path, args=None):
         if not target_file[-3:] == ".py":
             return f'Error: "{file_path}" is not a Python file'
 
-        valid_target_dir= os.path.commonpath([working_dir_abs, target_file]) == working_dir_abs
+        valid_target_dir = os.path.commonpath([working_dir_abs, target_file]) == working_dir_abs
 
         if not valid_target_dir:
             return f'Error: Cannot execute "{file_path}" as it is outside the permitted working directory'
@@ -38,3 +39,24 @@ def run_python_file(working_directory, file_path, args=None):
         
     except Exception as e:
         return f"Error: executing Python file {e}"
+    
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Executes/runs a Python file. Use this when the user asks to run, execute, or launch a Python script.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="Directory path to the Python file to run, relative to the working directory (default is the working directory itself)",
+            ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                description="Array of String arguments for the Python function (default is None)",
+                items=types.Schema(
+                    type=types.Type.STRING,
+                ),
+            ),
+        },
+    ),
+)
